@@ -10,6 +10,7 @@ namespace Mygento\JsBundler\Model;
 
 class Extractor implements \Magento\Framework\View\Xsd\Media\TypeDataExtractorInterface
 {
+    const VIEW_CONFIG_MODULE = 'Mygento_JsBundler';
     const ITEM_PATH = 'bundle';
     const BUNDLE_PATH = 'bundles';
 

@@ -1,24 +1,12 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Deploy\Service\Bundle">
-        <plugin name="builder" type="Mygento\JsBundler\Plugin\Builder" sortOrder="50"/>
+        <plugin name="jsbundler_builder" type="Mygento\JsBundler\Plugin\Builder" sortOrder="50"/>
     </type>
 
-<!--    <type name="Magento\Framework\Config\View">
-        <arguments>
-            <argument name="xpath" xsi:type="array">
-                <item name="bundles" xsi:type="array">
-                    <item name="/view/media/jsbundles" xsi:type="array">
-                        <item name="id" xsi:type="string">name</item>
-                    </item>
-                    <item name="/view/media/jsbundles/bundle" xsi:type="array">
-                        <item name="id" xsi:type="string">type</item>
-                        <item name="id2" xsi:type="string">item</item>
-                    </item>
-                </item>
-            </argument>
-        </arguments>
-    </type>-->
+    <type name="Magento\Framework\RequireJs\Config">
+        <plugin name="jsbundler_config" type="Mygento\JsBundler\Plugin\Config" sortOrder="50"/>
+    </type>
 
     <type name="Magento\Framework\View\Xsd\Media\TypeDataExtractorPool">
         <arguments>

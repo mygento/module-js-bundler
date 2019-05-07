@@ -13,7 +13,10 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Builder
 {
-    const VIEW_CONFIG_MODULE = 'Mygento_JsBundler';
+    /**
+     * @var \Mygento\JsBundler\Helper\Data
+     */
+    private $helper;
 
     /**
      * @var \Magento\Framework\View\Asset\Minification
@@ -26,16 +29,6 @@ class Builder
     private $utilityFiles;
 
     /**
-     * @var \Magento\Framework\View\Design\Theme\ThemeProviderInterface
-     */
-    private $themeProvider;
-
-    /**
-     * @var \Magento\Framework\View\ConfigInterface
-     */
-    private $viewConfig;
-
-    /**
      * @var string
      */
     private $pubStaticDir;
@@ -46,22 +39,19 @@ class Builder
     private $content;
 
     /**
-     * @param \Magento\Framework\View\ConfigInterface $viewConfig
-     * @param \Magento\Framework\View\Design\Theme\ThemeProviderInterface $themeProvider
+     * @param \Mygento\JsBundler\Helper\Data $helper
      * @param \Magento\Framework\Filesystem $fs
      * @param \Magento\Framework\App\Utility\Files $files
      * @param \Magento\Framework\View\Asset\Minification $minification
      * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
-        \Magento\Framework\View\ConfigInterface $viewConfig,
-        \Magento\Framework\View\Design\Theme\ThemeProviderInterface $themeProvider,
+        \Mygento\JsBundler\Helper\Data $helper,
         \Magento\Framework\Filesystem $fs,
         \Magento\Framework\App\Utility\Files $files,
         \Magento\Framework\View\Asset\Minification $minification
     ) {
-        $this->viewConfig = $viewConfig;
-        $this->themeProvider = $themeProvider;
+        $this->helper = $helper;
         $this->utilityFiles = $files;
         $this->minification = $minification;
 
@@ -78,15 +68,16 @@ class Builder
      */
     public function afterDeploy($subject, $result, $area, $theme, $locale)
     {
-        $files = $this->getConfig($area, $theme)->getMediaEntities(
-            self::VIEW_CONFIG_MODULE,
+        $files = $this->helper->getViewConfig($area, $theme)->getMediaEntities(
+            \Mygento\JsBundler\Model\Extractor::VIEW_CONFIG_MODULE,
             \Mygento\JsBundler\Model\Extractor::BUNDLE_PATH
         );
+
         if (empty($files)) {
             return $result;
         }
 
-        $config = $this->transformConfig($files);
+        $config = $this->helper->transformConfig($files);
         $bundleFiles = array_keys($config);
         if (count($bundleFiles) < 2) {
             return $result;
@@ -136,41 +127,5 @@ class Builder
         }
 
         return $content;
-    }
-
-    /**
-     * Get View Configuration object related to the given area and theme
-     *
-     * @param string $area
-     * @param string $theme
-     * @return \Magento\Framework\Config\View
-     */
-    private function getConfig($area, $theme)
-    {
-        $themePath = $area . '/' . $theme;
-        if (!isset($this->config[$themePath])) {
-            $this->config[$themePath] = $this->viewConfig->getViewConfig([
-                'area' => $area,
-                'themeModel' => $this->themeProvider->getThemeByFullPath($themePath),
-            ]);
-        }
-
-        return $this->config[$themePath];
-    }
-
-    /**
-     * @param array $config
-     * @return array
-     */
-    private function transformConfig(array $config): array
-    {
-        $result = [];
-        foreach ($config as $bundle => $items) {
-            foreach ($items as $item) {
-                $result[$item] = $bundle;
-            }
-        }
-
-        return $result;
     }
 }
