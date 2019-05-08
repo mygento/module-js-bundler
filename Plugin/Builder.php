@@ -68,6 +68,7 @@ class Builder
      */
     public function afterDeploy($subject, $result, $area, $theme, $locale)
     {
+        $this->content = [];
         $files = $this->helper->getViewConfig($area, $theme)->getMediaEntities(
             \Mygento\JsBundler\Model\Extractor::VIEW_CONFIG_MODULE,
             \Mygento\JsBundler\Model\Extractor::BUNDLE_PATH
@@ -100,7 +101,10 @@ class Builder
 
             if (in_array($this->minification->removeMinifiedSign($filePath), $bundleFiles)) {
                 $bundle = $config[$this->minification->removeMinifiedSign($filePath)];
-                $this->content[$bundle][] = $this->getFileContent($this->minification->addMinifiedSign($sourcePath));
+                $this->content[$bundle][] = $this->updateFile(
+                    $this->minification->removeMinifiedSign($filePath),
+                    $this->minification->addMinifiedSign($sourcePath)
+                );
             }
         }
         foreach ($this->content as $bundleName => $content) {
@@ -111,6 +115,20 @@ class Builder
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $filename
+     * @param string $source
+     * @return string
+     */
+    private function updateFile($filename, $source): string
+    {
+        $content = $this->getFileContent($source);
+        $file = pathinfo($filename);
+        $fileId = $file['dirname'] . '/' . $file['filename'];
+
+        return str_replace('define([', "define('${fileId}', [", $content);
     }
 
     /**
