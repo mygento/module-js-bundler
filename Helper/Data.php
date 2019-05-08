@@ -25,6 +25,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     private $config;
 
+    /**
+     * @param \Magento\Framework\View\ConfigInterface $viewConfig
+     * @param \Magento\Framework\View\Design\Theme\ThemeProviderInterface $themeProvider
+     * @param \Magento\Framework\App\Helper\Context $context
+     */
     public function __construct(
         \Magento\Framework\View\ConfigInterface $viewConfig,
         \Magento\Framework\View\Design\Theme\ThemeProviderInterface $themeProvider,

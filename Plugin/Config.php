@@ -29,6 +29,7 @@ class Config
     /**
      * @param \Magento\Framework\RequireJs\Config $subject
      * @param string $result
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      * @return type
      */
     public function afterGetConfig($subject, $result)
@@ -60,7 +61,9 @@ class Config
                 continue;
             }
 
-            $map[] = '\'' . BundleInterface::BUNDLE_JS_DIR . '/' . $bundle . '-bundle\': [' . implode(',', $files) . ']';
+            $map[] = "'" . BundleInterface::BUNDLE_JS_DIR
+                . '/' . $bundle . "-bundle': "
+                . '[' . implode(',', $files) . ']';
         }
         $result .= implode(',' . PHP_EOL, $map);
         $result .= PHP_EOL . '}});';

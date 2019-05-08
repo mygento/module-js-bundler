@@ -34,7 +34,7 @@ class Builder
     private $pubStaticDir;
 
     /**
-     *  @var array
+     * @var array
      */
     private $content;
 
@@ -65,6 +65,7 @@ class Builder
      * @param string $area
      * @param string $theme
      * @param string $locale
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function afterDeploy($subject, $result, $area, $theme, $locale)
     {
@@ -109,7 +110,9 @@ class Builder
         }
         foreach ($this->content as $bundleName => $content) {
             $bundleFile = $this->pubStaticDir->openFile(
-                $this->minification->addMinifiedSign($pathToBundleDir . DIRECTORY_SEPARATOR . $bundleName . '-bundle.js')
+                $this->minification->addMinifiedSign(
+                    $pathToBundleDir . DIRECTORY_SEPARATOR . $bundleName . '-bundle.js'
+                )
             );
             $bundleFile->write(implode(PHP_EOL, $content));
         }
@@ -128,7 +131,7 @@ class Builder
         $file = pathinfo($filename);
         $fileId = $file['dirname'] . '/' . $file['filename'];
 
-        return str_replace('define([', "define('${fileId}', [", $content);
+        return str_replace('define([', "define('" . $fileId . "',[", $content);
     }
 
     /**
