@@ -42,6 +42,6 @@ class Config
             );
         }
 
-        return (bool)$this->enabled;
+        return (bool) $this->enabled;
     }
 }
