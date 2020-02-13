@@ -18,12 +18,20 @@ class Config
     private $helper;
 
     /**
+     * @var \Mygento\JsBundler\Model\Config
+     */
+    private $config;
+
+    /**
      * @param \Mygento\JsBundler\Helper\Data $helper
+     * @param \Mygento\JsBundler\Model\Config $config
      */
     public function __construct(
-        \Mygento\JsBundler\Helper\Data $helper
+        \Mygento\JsBundler\Helper\Data $helper,
+        \Mygento\JsBundler\Model\Config $config
     ) {
         $this->helper = $helper;
+        $this->config = $config;
     }
 
     /**
@@ -34,6 +42,10 @@ class Config
      */
     public function afterGetConfig($subject, $result)
     {
+        if (!$this->config->isEnabled()) {
+            return $result;
+        }
+
         $path = explode('/', str_replace('/' . $subject::MIXINS_FILE_NAME, '', $subject->getMixinsFileRelativePath()));
         $area = array_shift($path);
         array_pop($path);
