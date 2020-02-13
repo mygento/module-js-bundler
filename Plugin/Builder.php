@@ -39,24 +39,31 @@ class Builder
     private $content;
 
     /**
+     * @var \Mygento\JsBundler\Model\Config
+     */
+    private $config;
+
+    /**
      * @param \Mygento\JsBundler\Helper\Data $helper
      * @param \Magento\Framework\Filesystem $fs
      * @param \Magento\Framework\App\Utility\Files $files
      * @param \Magento\Framework\View\Asset\Minification $minification
+     * @param \Mygento\JsBundler\Model\Config $config
      * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
         \Mygento\JsBundler\Helper\Data $helper,
         \Magento\Framework\Filesystem $fs,
         \Magento\Framework\App\Utility\Files $files,
-        \Magento\Framework\View\Asset\Minification $minification
+        \Magento\Framework\View\Asset\Minification $minification,
+        \Mygento\JsBundler\Model\Config $config
     ) {
         $this->helper = $helper;
         $this->utilityFiles = $files;
         $this->minification = $minification;
-
         $this->pubStaticDir = $fs->getDirectoryWrite(DirectoryList::STATIC_VIEW);
         $this->content = [];
+        $this->config = $config;
     }
 
     /**
@@ -69,6 +76,10 @@ class Builder
      */
     public function afterDeploy($subject, $result, $area, $theme, $locale)
     {
+        if (!$this->config->isEnabled()) {
+            return $result;
+        }
+
         $this->content = [];
         $files = $this->helper->getViewConfig($area, $theme)->getMediaEntities(
             \Mygento\JsBundler\Model\Extractor::VIEW_CONFIG_MODULE,
