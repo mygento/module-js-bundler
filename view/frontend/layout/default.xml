@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Mygento Team
+ * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @package Mygento_JsBundler
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="default_head_blocks"/>
+    <body>
+        <referenceContainer name="after.body.start">
+            <block class="Mygento\JsBundler\Block\Html\Head\Config" name="js-bundler-config" before="requirejs-config" ifconfig="mygento_js_bundler/general/enabled"/>
+        </referenceContainer>
+    </body>
+</page>

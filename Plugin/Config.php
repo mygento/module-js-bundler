@@ -9,9 +9,12 @@
 namespace Mygento\JsBundler\Plugin;
 
 use Magento\Deploy\Package\BundleInterface;
+use Mygento\JsBundler\Api\RequireJsConfigCreatorInterface;
 
 class Config
 {
+    const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
+
     /**
      * @var \Mygento\JsBundler\Helper\Data
      */
@@ -23,15 +26,23 @@ class Config
     private $config;
 
     /**
+     * @var RequireJsConfigCreatorInterface
+     */
+    private $requireJsConfigCreator;
+
+    /**
      * @param \Mygento\JsBundler\Helper\Data $helper
      * @param \Mygento\JsBundler\Model\Config $config
+     * @param RequireJsConfigCreatorInterface $requireJsConfigCreator
      */
     public function __construct(
         \Mygento\JsBundler\Helper\Data $helper,
-        \Mygento\JsBundler\Model\Config $config
+        \Mygento\JsBundler\Model\Config $config,
+        RequireJsConfigCreatorInterface $requireJsConfigCreator
     ) {
         $this->helper = $helper;
         $this->config = $config;
+        $this->requireJsConfigCreator = $requireJsConfigCreator;
     }
 
     /**
@@ -66,8 +77,9 @@ class Config
             return $result;
         }
 
-        $result .= PHP_EOL . 'requirejs.config({bundles: {' . PHP_EOL;
+        $bundleAssetData = $result . PHP_EOL . 'requirejs.config({bundles: {' . PHP_EOL;
         $map = [];
+
         foreach ($this->helper->transposeConfig($config) as $bundle => $files) {
             if (count($files) < 2) {
                 continue;
@@ -77,8 +89,11 @@ class Config
                 . '/' . $bundle . "-bundle': "
                 . '[' . implode(',', $files) . ']';
         }
-        $result .= implode(',' . PHP_EOL, $map);
-        $result .= PHP_EOL . '}});';
+
+        $bundleAssetData .= implode(',' . PHP_EOL, $map);
+        $bundleAssetData .= PHP_EOL . '}});';
+
+        $this->requireJsConfigCreator->create(self::BUNDLE_ASSET_FILE_NAME, $bundleAssetData);
 
         return $result;
     }
