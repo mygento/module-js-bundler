@@ -8,12 +8,12 @@
 
 namespace Mygento\JsBundler\Block\Html\Head;
 
+use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\RequireJs\Config as RequireJsConfig;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\Context;
 use Magento\Framework\View\Page\Config as PageConfig;
 use Mygento\JsBundler\Api\RequireJsConfigAssetReceiverInterface;
-use Magento\Framework\App\Filesystem\DirectoryList;
-use Magento\Framework\RequireJs\Config as RequireJsConfig;
 
 class Config extends AbstractBlock
 {
@@ -65,16 +65,19 @@ class Config extends AbstractBlock
     }
 
     /**
-     * @return AbstractBlock
      * @throws \Magento\Framework\Exception\FileSystemException
+     * @return AbstractBlock
      */
     protected function _prepareLayout()
     {
         $assetCollection = $this->pageConfig->getAssetCollection();
-        $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_BUNDLER_FILE);
-        $requireJsConfigBundlerFullPath =  $this->directoryList->getPath(DirectoryList::STATIC_VIEW) . '/' . $requireJsConfigBundler->getPath();
+        $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(
+            self::REQUIREJS_CONFIG_BUNDLER_FILE
+        );
+        $requireJsConfigBundlerFullPath = $this->directoryList->getPath(DirectoryList::STATIC_VIEW)
+         . '/' . $requireJsConfigBundler->getPath();
 
-        if (file_exists($requireJsConfigBundlerFullPath)) {
+        if (file_exists($requireJsConfigBundlerFullPath)) { //phpcs:ignore
             $assetCollection->insert(
                 $requireJsConfigBundler->getPath(),
                 $requireJsConfigBundler,
@@ -82,7 +85,9 @@ class Config extends AbstractBlock
             );
 
             //remove original requirejs-config from asset collection
-            $requireJsConfigOriginal = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_ORIGINAL_FILE);
+            $requireJsConfigOriginal = $this->requireJsConfigAssetReceiver->receive(
+                self::REQUIREJS_CONFIG_ORIGINAL_FILE
+            );
             $assetCollection->remove($requireJsConfigOriginal->getPath());
         }
 

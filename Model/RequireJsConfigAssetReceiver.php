@@ -8,8 +8,8 @@
 
 namespace Mygento\JsBundler\Model;
 
-use Mygento\JsBundler\Api\RequireJsConfigAssetReceiverInterface;
 use Magento\Framework\View\Asset\Repository;
+use Mygento\JsBundler\Api\RequireJsConfigAssetReceiverInterface;
 
 class RequireJsConfigAssetReceiver implements RequireJsConfigAssetReceiverInterface
 {

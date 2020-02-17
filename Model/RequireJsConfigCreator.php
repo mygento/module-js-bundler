@@ -10,9 +10,9 @@ namespace Mygento\JsBundler\Model;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
+use Magento\Framework\View\Asset\Minification;
 use Magento\Framework\View\Asset\Repository;
 use Mygento\JsBundler\Api\RequireJsConfigCreatorInterface;
-use Magento\Framework\View\Asset\Minification;
 
 class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
 {
@@ -25,6 +25,7 @@ class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
      * @var Repository
      */
     private $assetRepository;
+
     /**
      * @var Minification
      */
@@ -49,8 +50,8 @@ class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
      * @param string $configFileName
      * @param string $configData
      *
-     * @return void
      * @throws \Magento\Framework\Exception\FileSystemException
+     * @return void
      */
     public function create(string $configFileName, string $configData)
     {
