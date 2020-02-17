@@ -12,7 +12,7 @@ use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\Context;
 use Magento\Framework\View\Page\Config as PageConfig;
 use Mygento\JsBundler\Api\RequireJsConfigAssetReceiverInterface;
-use Magento\Framework\Filesystem\DirectoryList;
+use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\RequireJs\Config as RequireJsConfig;
 
 class Config extends AbstractBlock
@@ -66,22 +66,25 @@ class Config extends AbstractBlock
 
     /**
      * @return AbstractBlock
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     protected function _prepareLayout()
     {
         $assetCollection = $this->pageConfig->getAssetCollection();
         $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_BUNDLER_FILE);
+        $requireJsConfigBundlerFullPath =  $this->directoryList->getPath(DirectoryList::STATIC_VIEW) . '/' . $requireJsConfigBundler->getPath();
 
-        if ($requireJsConfigBundler) {
+        if (file_exists($requireJsConfigBundlerFullPath)) {
             $assetCollection->insert(
                 $requireJsConfigBundler->getFilePath(),
                 $requireJsConfigBundler,
                 $this->requireJsConfig->getMixinsFileRelativePath()
             );
-        }
 
-        $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_ORIGINAL_FILE);
-        $assetCollection->remove($requireJsConfigBundler->getFilePath());
+            //remove original requirejs-config from asset collection
+            $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_ORIGINAL_FILE);
+            $assetCollection->remove($requireJsConfigBundler->getFilePath());
+        }
 
         return parent::_prepareLayout();
     }
