@@ -1,5 +1,10 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Mygento\JsBundler\Api\RequireJsConfigAssetReceiverInterface"
+                type="Mygento\JsBundler\Model\RequireJsConfigAssetReceiver"/>
+    <preference for="Mygento\JsBundler\Api\RequireJsConfigCreatorInterface"
+                type="Mygento\JsBundler\Model\RequireJsConfigCreator"/>
+
     <type name="Magento\Deploy\Service\Bundle">
         <plugin name="jsbundler_builder" type="Mygento\JsBundler\Plugin\Builder" sortOrder="50"/>
     </type>
