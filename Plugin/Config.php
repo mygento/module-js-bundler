@@ -53,10 +53,6 @@ class Config
      */
     public function afterGetConfig($subject, $result)
     {
-        if (!$this->config->isEnabled()) {
-            return $result;
-        }
-
         $path = explode('/', str_replace('/' . $subject::MIXINS_FILE_NAME, '', $subject->getMixinsFileRelativePath()));
         $area = array_shift($path);
         array_pop($path);

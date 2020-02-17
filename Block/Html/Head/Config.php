@@ -76,14 +76,14 @@ class Config extends AbstractBlock
 
         if (file_exists($requireJsConfigBundlerFullPath)) {
             $assetCollection->insert(
-                $requireJsConfigBundler->getFilePath(),
+                $requireJsConfigBundler->getPath(),
                 $requireJsConfigBundler,
                 $this->requireJsConfig->getMixinsFileRelativePath()
             );
 
             //remove original requirejs-config from asset collection
-            $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_ORIGINAL_FILE);
-            $assetCollection->remove($requireJsConfigBundler->getFilePath());
+            $requireJsConfigOriginal = $this->requireJsConfigAssetReceiver->receive(self::REQUIREJS_CONFIG_ORIGINAL_FILE);
+            $assetCollection->remove($requireJsConfigOriginal->getPath());
         }
 
         return parent::_prepareLayout();

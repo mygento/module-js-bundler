@@ -12,6 +12,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 use Magento\Framework\Filesystem;
 use Magento\Framework\View\Asset\Repository;
 use Mygento\JsBundler\Api\RequireJsConfigCreatorInterface;
+use Magento\Framework\View\Asset\Minification;
 
 class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
 {
@@ -24,17 +25,24 @@ class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
      * @var Repository
      */
     private $assetRepository;
+    /**
+     * @var Minification
+     */
+    private $minification;
 
     /**
      * @param Filesystem $filesystem
      * @param Repository $assetRepository
+     * @param Minification $minification
      */
     public function __construct(
         Filesystem $filesystem,
-        Repository $assetRepository
+        Repository $assetRepository,
+        Minification $minification
     ) {
         $this->filesystem = $filesystem;
         $this->assetRepository = $assetRepository;
+        $this->minification = $minification;
     }
 
     /**
@@ -47,7 +55,9 @@ class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
     public function create(string $configFileName, string $configData)
     {
         $staticContext = $this->assetRepository->getStaticViewFileContext();
-        $configFileRelativePath = $staticContext->getConfigPath() . '/' . $configFileName;
+        $configFileRelativePath = $this->minification->addMinifiedSign(
+            $staticContext->getConfigPath() . '/' . $configFileName
+        );
 
         $dir = $this->filesystem->getDirectoryWrite(DirectoryList::STATIC_VIEW);
         $dir->writeFile($configFileRelativePath, $configData);

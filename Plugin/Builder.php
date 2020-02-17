@@ -76,10 +76,6 @@ class Builder
      */
     public function afterDeploy($subject, $result, $area, $theme, $locale)
     {
-        if (!$this->config->isEnabled()) {
-            return $result;
-        }
-
         $this->content = [];
         $files = $this->helper->getViewConfig($area, $theme)->getMediaEntities(
             \Mygento\JsBundler\Model\Extractor::VIEW_CONFIG_MODULE,
