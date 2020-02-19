@@ -20,4 +20,12 @@
             </argument>
         </arguments>
     </type>
+
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="js_bundler" xsi:type="object">Mygento\JsBundler\Console\Command\Bundle</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

@@ -19,10 +19,9 @@ class Bundle extends \Symfony\Component\Console\Command\Command
     private $config;
 
     public function __construct(
-        \Mygento\JsBundler\Model\Config\Schema $config,
-        string $name
+        \Mygento\JsBundler\Model\Config\Schema $config
     ) {
-        parent::__construct($name);
+        parent::__construct();
         $this->config = $config;
     }
 
@@ -34,5 +33,14 @@ class Bundle extends \Symfony\Component\Console\Command\Command
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $config = $this->config->get();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    protected function configure()
+    {
+        $this->setName('setup:static-content:bundler')
+            ->setDescription('Creates js bundles');
     }
 }
