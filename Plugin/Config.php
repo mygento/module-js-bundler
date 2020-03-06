@@ -13,6 +13,12 @@ use Mygento\JsBundler\Api\RequireJsConfigCreatorInterface;
 
 class Config
 {
+
+    /**
+     * @var \Mygento\JsBundler\Model\Config\Schema
+     */
+    private $sconfig;
+
     const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
 
     /**
@@ -30,12 +36,8 @@ class Config
      */
     private $requireJsConfigCreator;
 
-    /**
-     * @param \Mygento\JsBundler\Helper\Data $helper
-     * @param \Mygento\JsBundler\Model\Config $config
-     * @param RequireJsConfigCreatorInterface $requireJsConfigCreator
-     */
     public function __construct(
+        \Mygento\JsBundler\Model\Config\Schema $sconfig,
         \Mygento\JsBundler\Helper\Data $helper,
         \Mygento\JsBundler\Model\Config $config,
         RequireJsConfigCreatorInterface $requireJsConfigCreator
@@ -43,6 +45,7 @@ class Config
         $this->helper = $helper;
         $this->config = $config;
         $this->requireJsConfigCreator = $requireJsConfigCreator;
+        $this->sconfig = $sconfig;
     }
 
     /**
@@ -53,6 +56,9 @@ class Config
      */
     public function afterGetConfig($subject, $result)
     {
+        $config = $this->sconfig->get();
+        var_dump($config);
+
         $path = explode('/', str_replace('/' . $subject::MIXINS_FILE_NAME, '', $subject->getMixinsFileRelativePath()));
         $area = array_shift($path);
         array_pop($path);
