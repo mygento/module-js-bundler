@@ -37,7 +37,7 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
         $iterator = $this->moduleReader->getConfigurationFiles($filename)->toArray();
         $bundlePath = $this->resolver->resolve(
             RulePool::TYPE_FILE,
-            'etc/view.xml',
+            'etc/js_bundler.xml',
             $this->area,
             $this->currentTheme
         );
