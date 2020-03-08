@@ -13,7 +13,6 @@ use Magento\Framework\View\Design\Fallback\RulePool;
 use Magento\Framework\View\Design\FileResolution\Fallback\ResolverInterface;
 use Magento\Framework\View\DesignInterface;
 
-
 class Resolver implements \Magento\Framework\Config\FileResolverInterface
 {
     /**
@@ -32,14 +31,14 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
         $this->moduleReader = $moduleReader;
     }
 
-    public function get($filename, $scope): array
+    public function getByTheme($filename, $scope, $area, $theme): array
     {
         $iterator = $this->moduleReader->getConfigurationFiles($filename)->toArray();
         $bundlePath = $this->resolver->resolve(
             RulePool::TYPE_FILE,
             'etc/js_bundler.xml',
-            $this->area,
-            $this->currentTheme
+            $area,
+            $theme
         );
         if (file_exists($bundlePath)) {
             try {
@@ -54,5 +53,15 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
         }
 
         return $iterator;
+    }
+
+    /**
+     * @param type $filename
+     * @param type $scope
+     * @return array
+     */
+    public function get($filename, $scope): array
+    {
+        return [];
     }
 }

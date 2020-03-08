@@ -18,6 +18,19 @@ class Converter implements \Magento\Framework\Config\ConverterInterface
      */
     public function convert($source)
     {
-        return [];
+        $result = [];
+        $bundles = $source->getElementsByTagName('bundle');
+        foreach ($bundles as $bundle) {
+            $name = $bundle->getAttribute('name');
+            if (!isset($result[$name])) {
+                $result[$name] = [];
+            }
+            foreach ($bundle->getElementsByTagName('item') as $item) {
+                $file = pathinfo((string) $item->nodeValue);
+                $result[$name][] = '\'' . $file['dirname'] . '/' . $file['filename'] . '\'';
+            }
+        }
+
+        return $result;
     }
 }

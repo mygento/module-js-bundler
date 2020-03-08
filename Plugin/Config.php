@@ -13,23 +13,17 @@ use Mygento\JsBundler\Api\RequireJsConfigCreatorInterface;
 
 class Config
 {
+    const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
+
+    /**
+     * @var \Magento\Framework\View\DesignInterface
+     */
+    private $design;
 
     /**
      * @var \Mygento\JsBundler\Model\Config\Schema
      */
     private $sconfig;
-
-    const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
-
-    /**
-     * @var \Mygento\JsBundler\Helper\Data
-     */
-    private $helper;
-
-    /**
-     * @var \Mygento\JsBundler\Model\Config
-     */
-    private $config;
 
     /**
      * @var RequireJsConfigCreatorInterface
@@ -38,14 +32,12 @@ class Config
 
     public function __construct(
         \Mygento\JsBundler\Model\Config\Schema $sconfig,
-        \Mygento\JsBundler\Helper\Data $helper,
-        \Mygento\JsBundler\Model\Config $config,
-        RequireJsConfigCreatorInterface $requireJsConfigCreator
+        RequireJsConfigCreatorInterface $requireJsConfigCreator,
+        \Magento\Framework\View\DesignInterface $design
     ) {
-        $this->helper = $helper;
-        $this->config = $config;
         $this->requireJsConfigCreator = $requireJsConfigCreator;
         $this->sconfig = $sconfig;
+        $this->design = $design;
     }
 
     /**
@@ -56,33 +48,16 @@ class Config
      */
     public function afterGetConfig($subject, $result)
     {
-        $config = $this->sconfig->get();
-        var_dump($config);
-
-        $path = explode('/', str_replace('/' . $subject::MIXINS_FILE_NAME, '', $subject->getMixinsFileRelativePath()));
-        $area = array_shift($path);
-        array_pop($path);
-        $theme = implode('/', $path);
-
-        $files = $this->helper->getViewConfig($area, $theme)->getMediaEntities(
-            \Mygento\JsBundler\Model\Extractor::VIEW_CONFIG_MODULE,
-            \Mygento\JsBundler\Model\Extractor::BUNDLE_PATH
-        );
-
-        if (empty($files)) {
-            return $result;
-        }
-
-        $config = $this->helper->transformConfig($files);
-        $bundleFiles = array_keys($config);
-        if (count($bundleFiles) < 2) {
+        $themeClass = $this->design->getDesignTheme();
+        $config = $this->sconfig->getConfig($themeClass);
+        if (empty($config)) {
             return $result;
         }
 
         $bundleAssetData = $result . PHP_EOL . 'requirejs.config({bundles: {' . PHP_EOL;
         $map = [];
 
-        foreach ($this->helper->transposeConfig($config) as $bundle => $files) {
+        foreach ($config as $bundle => $files) {
             if (count($files) < 2) {
                 continue;
             }

@@ -11,7 +11,7 @@ namespace Mygento\JsBundler\Model\Config;
 class Reader extends \Magento\Framework\Config\Reader\Filesystem
 {
     public function __construct(
-        \Mygento\JsBundler\Model\Config\Resolver $fileResolver,
+        Resolver $fileResolver,
         Converter $converter,
         SchemaLocator $schemaLocator,
         \Magento\Framework\Config\ValidationStateInterface $validationState,
@@ -32,26 +32,19 @@ class Reader extends \Magento\Framework\Config\Reader\Filesystem
         );
     }
 
-    /**
-     * Load configuration scope
-     *
-     * @param string|null $scope
-     * @return array
-     */
-    public function read($scope = null)
+    public function readByTheme(\Magento\Framework\View\Design\ThemeInterface $theme): array
     {
-        $scope = $scope ?: $this->_defaultScope;
-        $fileList = $this->_fileResolver->get($this->_fileName, $scope);
+        $fileList = $this->_fileResolver->getByTheme(
+            $this->_fileName,
+            $this->_defaultScope,
+            $theme->getArea(),
+            $theme
+        );
+
         if (!count($fileList)) {
             return [];
         }
-        $output = $this->_readFiles($fileList);
 
-        return $output;
-    }
-
-    private function resolve()
-    {
-
+        return $this->_readFiles($fileList);
     }
 }
