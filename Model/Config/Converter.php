@@ -26,8 +26,7 @@ class Converter implements \Magento\Framework\Config\ConverterInterface
                 $result[$name] = [];
             }
             foreach ($bundle->getElementsByTagName('item') as $item) {
-                $file = pathinfo((string) $item->nodeValue);
-                $result[$name][] = '\'' . $file['dirname'] . '/' . $file['filename'] . '\'';
+                $result[$name][] = $item->nodeValue;
             }
         }
 

@@ -23,7 +23,7 @@ class Config
     /**
      * @var \Mygento\JsBundler\Model\Config\Schema
      */
-    private $sconfig;
+    private $config;
 
     /**
      * @var RequireJsConfigCreatorInterface
@@ -31,12 +31,12 @@ class Config
     private $requireJsConfigCreator;
 
     public function __construct(
-        \Mygento\JsBundler\Model\Config\Schema $sconfig,
+        \Mygento\JsBundler\Model\Config\Schema $config,
         RequireJsConfigCreatorInterface $requireJsConfigCreator,
         \Magento\Framework\View\DesignInterface $design
     ) {
         $this->requireJsConfigCreator = $requireJsConfigCreator;
-        $this->sconfig = $sconfig;
+        $this->config = $config;
         $this->design = $design;
     }
 
@@ -44,12 +44,17 @@ class Config
      * @param \Magento\Framework\RequireJs\Config $subject
      * @param string $result
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @return type
+     * @return string
      */
     public function afterGetConfig($subject, $result)
     {
         $themeClass = $this->design->getDesignTheme();
-        $config = $this->sconfig->getConfig($themeClass);
+        $config = $this->config->getConfig($themeClass);
+
+        echo 'Config:' . PHP_EOL;
+        echo $themeClass->getFullPath() . PHP_EOL;
+        print_r($config);
+
         if (empty($config)) {
             return $result;
         }
@@ -57,10 +62,16 @@ class Config
         $bundleAssetData = $result . PHP_EOL . 'requirejs.config({bundles: {' . PHP_EOL;
         $map = [];
 
-        foreach ($config as $bundle => $files) {
-            if (count($files) < 2) {
+        foreach ($config as $bundle => $bundleFiles) {
+            if (count($bundleFiles) < 2) {
                 continue;
             }
+
+            $files = array_map(function ($item) {
+                $file = pathinfo($item);
+
+                return '\'' . $file['dirname'] . '/' . $file['filename'] . '\'';
+            }, $bundleFiles);
 
             $map[] = "'" . BundleInterface::BUNDLE_JS_DIR
                 . '/' . $bundle . "-bundle': "
