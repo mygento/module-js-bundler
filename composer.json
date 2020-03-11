@@ -26,7 +26,8 @@
     "magento/module-deploy": "100.3.*"
   },
   "require-dev": {
-      "mygento/coding-standard": "~2.13.5"
+      "mygento/coding-standard": "~2.13.5",
+      "magento/magento-coding-standard": "^4"
   },
   "autoload": {
     "files": [

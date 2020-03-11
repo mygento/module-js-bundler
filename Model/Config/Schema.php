@@ -20,6 +20,12 @@ class Schema extends \Magento\Framework\Config\Data
      */
     private $config;
 
+    /**
+     * @param \Mygento\JsBundler\Model\Config\Reader $reader
+     * @param \Magento\Framework\Config\CacheInterface $cache
+     * @param string $cacheId
+     * @param \Magento\Framework\Serialize\SerializerInterface $serializer
+     */
     public function __construct(
         Reader $reader,
         \Magento\Framework\Config\CacheInterface $cache,
@@ -46,6 +52,10 @@ class Schema extends \Magento\Framework\Config\Data
         return $this->config[$themePath];
     }
 
+    /**
+     * @param \Magento\Framework\View\Design\ThemeInterface $theme
+     * @return array
+     */
     private function readConfig(\Magento\Framework\View\Design\ThemeInterface $theme): array
     {
         return $this->reader->readByTheme($theme);

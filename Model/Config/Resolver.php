@@ -20,6 +20,11 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
      */
     private $moduleReader;
 
+    /**
+     * @param Reader $moduleReader
+     * @param DesignInterface $designInterface
+     * @param ResolverInterface $resolver
+     */
     public function __construct(
         Reader $moduleReader,
         DesignInterface $designInterface,
@@ -31,6 +36,16 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
         $this->moduleReader = $moduleReader;
     }
 
+    /**
+     * @param string $filename
+     * @param string $scope
+     * @param string $area
+     * @param string $theme
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     */
     public function getByTheme($filename, $scope, $area, $theme): array
     {
         $iterator = $this->moduleReader->getConfigurationFiles($filename)->toArray();
@@ -59,6 +74,8 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
      * @param type $filename
      * @param type $scope
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
     public function get($filename, $scope): array
     {

@@ -10,6 +10,16 @@ namespace Mygento\JsBundler\Model\Config;
 
 class Reader extends \Magento\Framework\Config\Reader\Filesystem
 {
+    /**
+     * @param \Mygento\JsBundler\Model\Config\Resolver $fileResolver
+     * @param \Mygento\JsBundler\Model\Config\Converter $converter
+     * @param \Mygento\JsBundler\Model\Config\SchemaLocator $schemaLocator
+     * @param \Magento\Framework\Config\ValidationStateInterface $validationState
+     * @param string $fileName
+     * @param array $idAttributes
+     * @param string $domDocumentClass
+     * @param string $defaultScope
+     */
     public function __construct(
         Resolver $fileResolver,
         Converter $converter,
@@ -32,6 +42,10 @@ class Reader extends \Magento\Framework\Config\Reader\Filesystem
         );
     }
 
+    /**
+     * @param \Magento\Framework\View\Design\ThemeInterface $theme
+     * @return array
+     */
     public function readByTheme(\Magento\Framework\View\Design\ThemeInterface $theme): array
     {
         $fileList = $this->_fileResolver->getByTheme(

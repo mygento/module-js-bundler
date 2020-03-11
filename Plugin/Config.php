@@ -30,6 +30,11 @@ class Config
      */
     private $requireJsConfigCreator;
 
+    /**
+     * @param \Mygento\JsBundler\Model\Config\Schema $config
+     * @param \Mygento\JsBundler\Api\RequireJsConfigCreatorInterface $requireJsConfigCreator
+     * @param \Magento\Framework\View\DesignInterface $design
+     */
     public function __construct(
         \Mygento\JsBundler\Model\Config\Schema $config,
         RequireJsConfigCreatorInterface $requireJsConfigCreator,
@@ -50,10 +55,6 @@ class Config
     {
         $themeClass = $this->design->getDesignTheme();
         $config = $this->config->getConfig($themeClass);
-
-        echo 'Config:' . PHP_EOL;
-        echo $themeClass->getFullPath() . PHP_EOL;
-        print_r($config);
 
         if (empty($config)) {
             return $result;
