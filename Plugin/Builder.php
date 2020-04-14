@@ -104,21 +104,19 @@ class Builder
             return $result;
         }
 
-        foreach ($filesList as $filePath => $sourcePath) {
-            $sourcePath = str_replace('\\', '/', $sourcePath);
-            $sourcePath = $this->pubStaticDir->getRelativePath($sourcePath);
-            $filePath = substr($sourcePath, strlen($folder) + 1);
-
+        foreach ($bundleFiles as $filePath) {
             $contentType = pathinfo($filePath, PATHINFO_EXTENSION);
             if (!in_array($contentType, \Magento\Deploy\Service\Bundle::$availableTypes)) {
                 continue;
             }
 
-            if (in_array($this->minification->removeMinifiedSign($filePath), $bundleFiles)) {
+            $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath);
+
+            if (in_array($relativePath, $filesList)) {
                 $bundle = $files[$this->minification->removeMinifiedSign($filePath)];
                 $this->content[$bundle][] = $this->updateFile(
                     $this->minification->removeMinifiedSign($filePath),
-                    $this->minification->addMinifiedSign($sourcePath)
+                    $this->minification->addMinifiedSign($relativePath)
                 );
             }
         }
@@ -143,9 +141,22 @@ class Builder
     {
         $content = $this->getFileContent($source);
         $file = pathinfo($filename);
+
+        if ($file['dirname'] == 'jquery/ui-modules') {
+            $file['dirname'] = 'jquery-ui-modules';
+        }
+
         $fileId = $file['dirname'] . '/' . $file['filename'];
 
-        return str_replace('define([', "define('" . $fileId . "',[", $content);
+        if ($file['dirname'] . '/' . $file['filename'] == 'requirejs/domReady') {
+            $fileId = $file['filename'];
+        }
+
+        $content = str_replace("define(\n ", "define('{$fileId}',", $content);
+        $content = str_replace('define([', "define('{$fileId}',[", $content);
+        $content = str_replace('define(function ()', "define('{$fileId}', [], function()", $content);
+
+        return $content;
     }
 
     /**

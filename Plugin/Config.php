@@ -71,6 +71,13 @@ class Config
             $files = array_map(function ($item) {
                 $file = pathinfo($item);
 
+                if ($file['dirname'] == 'jquery/ui-modules') {
+                    $file['dirname'] = 'jquery-ui-modules';
+                }
+                if ($file['dirname'] . '/' . $file['filename'] == 'requirejs/domReady') {
+                    return '\'' . $file['filename'] . '\'';
+                }
+
                 return '\'' . $file['dirname'] . '/' . $file['filename'] . '\'';
             }, $bundleFiles);
 
