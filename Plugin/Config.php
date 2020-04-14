@@ -16,12 +16,12 @@ class Config
     const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
 
     /**
-     * @var \Mygento\JsBundler\Helper\Data
+     * @var \Magento\Framework\View\DesignInterface
      */
-    private $helper;
+    private $design;
 
     /**
-     * @var \Mygento\JsBundler\Model\Config
+     * @var \Mygento\JsBundler\Model\Config\Schema
      */
     private $config;
 
@@ -31,55 +31,55 @@ class Config
     private $requireJsConfigCreator;
 
     /**
-     * @param \Mygento\JsBundler\Helper\Data $helper
-     * @param \Mygento\JsBundler\Model\Config $config
-     * @param RequireJsConfigCreatorInterface $requireJsConfigCreator
+     * @param \Mygento\JsBundler\Model\Config\Schema $config
+     * @param \Mygento\JsBundler\Api\RequireJsConfigCreatorInterface $requireJsConfigCreator
+     * @param \Magento\Framework\View\DesignInterface $design
      */
     public function __construct(
-        \Mygento\JsBundler\Helper\Data $helper,
-        \Mygento\JsBundler\Model\Config $config,
-        RequireJsConfigCreatorInterface $requireJsConfigCreator
+        \Mygento\JsBundler\Model\Config\Schema $config,
+        RequireJsConfigCreatorInterface $requireJsConfigCreator,
+        \Magento\Framework\View\DesignInterface $design
     ) {
-        $this->helper = $helper;
-        $this->config = $config;
         $this->requireJsConfigCreator = $requireJsConfigCreator;
+        $this->config = $config;
+        $this->design = $design;
     }
 
     /**
      * @param \Magento\Framework\RequireJs\Config $subject
      * @param string $result
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
-     * @return type
+     * @return string
      */
     public function afterGetConfig($subject, $result)
     {
-        $path = explode('/', str_replace('/' . $subject::MIXINS_FILE_NAME, '', $subject->getMixinsFileRelativePath()));
-        $area = array_shift($path);
-        array_pop($path);
-        $theme = implode('/', $path);
+        $themeClass = $this->design->getDesignTheme();
+        $config = $this->config->getConfig($themeClass);
 
-        $files = $this->helper->getViewConfig($area, $theme)->getMediaEntities(
-            \Mygento\JsBundler\Model\Extractor::VIEW_CONFIG_MODULE,
-            \Mygento\JsBundler\Model\Extractor::BUNDLE_PATH
-        );
-
-        if (empty($files)) {
-            return $result;
-        }
-
-        $config = $this->helper->transformConfig($files);
-        $bundleFiles = array_keys($config);
-        if (count($bundleFiles) < 2) {
+        if (empty($config)) {
             return $result;
         }
 
         $bundleAssetData = $result . PHP_EOL . 'requirejs.config({bundles: {' . PHP_EOL;
         $map = [];
 
-        foreach ($this->helper->transposeConfig($config) as $bundle => $files) {
-            if (count($files) < 2) {
+        foreach ($config as $bundle => $bundleFiles) {
+            if (count($bundleFiles) < 2) {
                 continue;
             }
+
+            $files = array_map(function ($item) {
+                $file = pathinfo($item);
+
+                if ($file['dirname'] == 'jquery/ui-modules') {
+                    $file['dirname'] = 'jquery-ui-modules';
+                }
+                if ($file['dirname'] . '/' . $file['filename'] == 'requirejs/domReady') {
+                    return '\'' . $file['filename'] . '\'';
+                }
+
+                return '\'' . $file['dirname'] . '/' . $file['filename'] . '\'';
+            }, $bundleFiles);
 
             $map[] = "'" . BundleInterface::BUNDLE_JS_DIR
                 . '/' . $bundle . "-bundle': "

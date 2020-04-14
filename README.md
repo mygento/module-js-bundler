@@ -9,22 +9,23 @@
 
 ## Usage
 
+Place a file js_bundler.xml in theme's etc folder
+
 ```
-<media>
-    ...
-    <jsbundles module="Mygento_JsBundler">
-        <bundle name="catalog1">
-            <item>Magento_Catalog/js/product/list/toolbar.js</item>
-            <item>Magento_Catalog/js/price-box.js</item>
-            <item>Magento_Catalog/js/catalog-add-to-cart.js</item>
-        </bundle>
-        <bundle name="catalog2">
-            <item>Magento_Catalog/js/price-box.js</item>
-            <item>Magento_Catalog/js/catalog-add-to-cart.js</item>
-        </bundle>
-    </jsbundles>
-    ...
-</media>
+<?xml version="1.0" encoding="utf-8"?>
+<bundles>
+  <bundle name="catalog">
+      <item>Magento_Catalog/js/product/list/toolbar.js</item>
+      <item>Magento_Catalog/js/price-box.js</item>
+      <item>Magento_Catalog/js/catalog-add-to-cart.js</item>
+  </bundle>
+  ....
+  <bundle name="checkout">
+      <item>....</item>
+      <item>....</item>
+      <item>....</item>
+  </bundle>
+</bundles>
 ```
 
 ## Compability
