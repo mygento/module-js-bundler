@@ -13,6 +13,7 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Builder
 {
+    const jsExt = '.js';
     /**
      * @var \Magento\Framework\View\Design\Theme\ThemeProvider
      */
@@ -105,12 +106,8 @@ class Builder
         }
 
         foreach ($bundleFiles as $filePath) {
-            $contentType = pathinfo($filePath, PATHINFO_EXTENSION);
-            if (!in_array($contentType, \Magento\Deploy\Service\Bundle::$availableTypes)) {
-                continue;
-            }
-
-            $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath);
+            $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath . self::jsExt);
+            $relativePath = $this->minification->addMinifiedSign($relativePath);
 
             if (in_array($relativePath, $filesList)) {
                 $bundle = $files[$this->minification->removeMinifiedSign($filePath)];
@@ -148,13 +145,10 @@ class Builder
 
         $fileId = $file['dirname'] . '/' . $file['filename'];
 
-        if ($file['dirname'] . '/' . $file['filename'] == 'requirejs/domReady') {
-            $fileId = $file['filename'];
-        }
-
         $content = str_replace("define(\n ", "define('{$fileId}',", $content);
         $content = str_replace('define([', "define('{$fileId}',[", $content);
         $content = str_replace('define(function ()', "define('{$fileId}', [], function()", $content);
+        $content = str_replace('define(function()', "define('{$fileId}', [], function()", $content);
 
         return $content;
     }
