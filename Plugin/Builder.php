@@ -107,10 +107,7 @@ class Builder
 
         foreach ($bundleFiles as $filePath) {
             $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath . self::jsExt);
-
-            if ($this->helper->jsMinifyEnabled()) {
-                $relativePath = $this->minification->addMinifiedSign($relativePath);
-            }
+            $relativePath = $this->minification->addMinifiedSign($relativePath);
 
             if (in_array($relativePath, $filesList)) {
                 $bundle = $files[$this->minification->removeMinifiedSign($filePath)];

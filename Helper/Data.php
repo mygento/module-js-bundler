@@ -8,8 +8,6 @@
 
 namespace Mygento\JsBundler\Helper;
 
-use Magento\Store\Model\ScopeInterface;
-
 class Data extends \Magento\Framework\App\Helper\AbstractHelper
 {
     /**
@@ -93,19 +91,5 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $result;
-    }
-
-    /**
-     * Check if js minify mode is enabled
-     *
-     * @param null $store
-     * @return bool
-     */
-    public function jsMinifyEnabled($store = null)
-    {
-        return $this->scopeConfig->isSetFlag(
-            \Magento\Config\Model\Config\Backend\Admin\Custom::XML_PATH_DEV_JS_MINIFY_FILES,
-            ScopeInterface::SCOPE_STORE, $store
-        );
     }
 }
