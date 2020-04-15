@@ -15,9 +15,9 @@ Place a file js_bundler.xml in theme's etc folder
 <?xml version="1.0" encoding="utf-8"?>
 <bundles>
   <bundle name="catalog">
-      <item>Magento_Catalog/js/product/list/toolbar.js</item>
-      <item>Magento_Catalog/js/price-box.js</item>
-      <item>Magento_Catalog/js/catalog-add-to-cart.js</item>
+      <item>Magento_Catalog/js/product/list/toolbar</item>
+      <item>Magento_Catalog/js/price-box</item>
+      <item>Magento_Catalog/js/catalog-add-to-cart</item>
   </bundle>
   ....
   <bundle name="checkout">

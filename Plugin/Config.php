@@ -74,9 +74,6 @@ class Config
                 if ($file['dirname'] == 'jquery/ui-modules') {
                     $file['dirname'] = 'jquery-ui-modules';
                 }
-                if ($file['dirname'] . '/' . $file['filename'] == 'requirejs/domReady') {
-                    return '\'' . $file['filename'] . '\'';
-                }
 
                 return '\'' . $file['dirname'] . '/' . $file['filename'] . '\'';
             }, $bundleFiles);
