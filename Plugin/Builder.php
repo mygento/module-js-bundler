@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2022 Mygento (https://www.mygento.ru)
  * @package Mygento_JsBundler
  */
 
@@ -13,7 +13,8 @@ use Magento\Framework\App\Filesystem\DirectoryList;
 
 class Builder
 {
-    const jsExt = '.js';
+    public const JSEXT = '.js';
+
     /**
      * @var \Magento\Framework\View\Design\Theme\ThemeProvider
      */
@@ -88,7 +89,7 @@ class Builder
     {
         $themeClass = $this->design->getThemeByFullPath($area . '/' . $theme);
         $config = $this->config->getConfig($themeClass);
-        if (empty($config)) {
+        if (!($config)) {
             return $result;
         }
 
@@ -106,7 +107,7 @@ class Builder
         }
 
         foreach ($bundleFiles as $filePath) {
-            $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath . self::jsExt);
+            $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath . self::JSEXT);
             $relativePath = $this->minification->addMinifiedSign($relativePath);
 
             if (in_array($relativePath, $filesList)) {
@@ -148,9 +149,8 @@ class Builder
         $content = str_replace("define(\n ", "define('{$fileId}',", $content);
         $content = str_replace('define([', "define('{$fileId}',[", $content);
         $content = str_replace('define(function ()', "define('{$fileId}', [], function()", $content);
-        $content = str_replace('define(function()', "define('{$fileId}', [], function()", $content);
 
-        return $content;
+        return str_replace('define(function()', "define('{$fileId}', [], function()", $content);
     }
 
     /**

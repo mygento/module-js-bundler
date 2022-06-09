@@ -1,7 +1,6 @@
 {
   "name": "mygento/module-js-bundler",
   "type": "magento2-module",
-  "version": "2.3.0",
   "license": "OSL-3.0",
   "homepage": "https://github.com/mygento/module-js-bundler",
   "description": "Magento 2 Advanced JS Bundler",
@@ -26,8 +25,7 @@
     "magento/module-deploy": "100.3.*"
   },
   "require-dev": {
-      "mygento/coding-standard": "~2.13.5",
-      "magento/magento-coding-standard": "^4"
+      "mygento/coding-standard": "~2.14.0-beta7"
   },
   "autoload": {
     "files": [
@@ -42,5 +40,10 @@
       "type": "composer",
       "url": "https://repo.magento.com"
     }
-  ]
+  ],
+  "config": {
+    "allow-plugins": {
+      "phpro/grumphp": true
+    }
+  }
 }

@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2022 Mygento (https://www.mygento.ru)
  * @package Mygento_JsBundler
  */
 
@@ -13,7 +13,7 @@ use Mygento\JsBundler\Api\RequireJsConfigCreatorInterface;
 
 class Config
 {
-    const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
+    public const BUNDLE_ASSET_FILE_NAME = 'requirejs-config-bundler.js';
 
     /**
      * @var \Magento\Framework\View\DesignInterface
@@ -56,7 +56,7 @@ class Config
         $themeClass = $this->design->getDesignTheme();
         $config = $this->config->getConfig($themeClass);
 
-        if (empty($config)) {
+        if (!($config)) {
             return $result;
         }
 

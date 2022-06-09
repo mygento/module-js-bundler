@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2022 Mygento (https://www.mygento.ru)
  * @package Mygento_JsBundler
  */
 
@@ -11,36 +11,26 @@ namespace Mygento\JsBundler\Model\Config;
 use Magento\Framework\Module\Dir\Reader;
 use Magento\Framework\View\Design\Fallback\RulePool;
 use Magento\Framework\View\Design\FileResolution\Fallback\ResolverInterface;
-use Magento\Framework\View\DesignInterface;
+use Magento\Framework\View\Design\ThemeInterface;
 
 class Resolver implements \Magento\Framework\Config\FileResolverInterface
 {
-    /**
-     * @var Reader
-     */
-    private $moduleReader;
+    private Reader $moduleReader;
+    private ResolverInterface $resolver;
 
-    /**
-     * @param Reader $moduleReader
-     * @param DesignInterface $designInterface
-     * @param ResolverInterface $resolver
-     */
     public function __construct(
         Reader $moduleReader,
-        DesignInterface $designInterface,
         ResolverInterface $resolver
     ) {
-        $this->resolver = $resolver;
-        $this->currentTheme = $designInterface->getDesignTheme();
-        $this->area = $designInterface->getArea();
         $this->moduleReader = $moduleReader;
+        $this->resolver = $resolver;
     }
 
     /**
      * @param string $filename
      * @param string $scope
      * @param string $area
-     * @param string $theme
+     * @param ThemeInterface $theme
      * @throws \Magento\Framework\Exception\LocalizedException
      * @return array
      *
