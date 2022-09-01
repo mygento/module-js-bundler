@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2022 Mygento (https://www.mygento.ru)
  * @package Mygento_JsBundler
  */
 
@@ -10,9 +10,9 @@ namespace Mygento\JsBundler\Model;
 
 class Extractor implements \Magento\Framework\View\Xsd\Media\TypeDataExtractorInterface
 {
-    const VIEW_CONFIG_MODULE = 'Mygento_JsBundler';
-    const ITEM_PATH = 'bundle';
-    const BUNDLE_PATH = 'bundles';
+    public const VIEW_CONFIG_MODULE = 'Mygento_JsBundler';
+    public const ITEM_PATH = 'bundle';
+    public const BUNDLE_PATH = 'bundles';
 
     /**
      * Extract media configuration data from the DOM structure

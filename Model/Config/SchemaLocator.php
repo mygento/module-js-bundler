@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2022 Mygento (https://www.mygento.ru)
  * @package Mygento_JsBundler
  */
 
@@ -12,11 +12,11 @@ use Magento\Framework\Module\Dir;
 
 class SchemaLocator implements \Magento\Framework\Config\SchemaLocatorInterface
 {
-    const CONFIG_FILE_SCHEMA = 'js_bundler.xsd';
+    public const CONFIG_FILE_SCHEMA = 'js_bundler.xsd';
 
-    /**
-     * @param \Magento\Framework\Module\Dir\Reader $moduleReader
-     */
+    private string $schema;
+    private string $perFileSchema;
+
     public function __construct(\Magento\Framework\Module\Dir\Reader $moduleReader)
     {
         $configDir = $moduleReader->getModuleDir(Dir::MODULE_ETC_DIR, 'Mygento_JsBundler');
