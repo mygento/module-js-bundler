@@ -20,7 +20,7 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
 
     public function __construct(
         Reader $moduleReader,
-        ResolverInterface $resolver
+        ResolverInterface $resolver,
     ) {
         $this->moduleReader = $moduleReader;
         $this->resolver = $resolver;
@@ -43,7 +43,7 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
             RulePool::TYPE_FILE,
             'etc/js_bundler.xml',
             $area,
-            $theme
+            $theme,
         );
         if (file_exists($bundlePath)) {
             try {
@@ -52,7 +52,7 @@ class Resolver implements \Magento\Framework\Config\FileResolverInterface
                 $iterator[$bundlePath] = $designDom->saveXML();
             } catch (\Exception $e) {
                 throw new \Magento\Framework\Exception\LocalizedException(
-                    new \Magento\Framework\Phrase('Could not read config file')
+                    new \Magento\Framework\Phrase('Could not read config file'),
                 );
             }
         }

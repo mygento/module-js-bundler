@@ -28,7 +28,7 @@ class Reader extends \Magento\Framework\Config\Reader\Filesystem
         $fileName = 'js_bundler.xml',
         $idAttributes = [],
         $domDocumentClass = \Magento\Framework\Config\Dom::class,
-        $defaultScope = 'global'
+        $defaultScope = 'global',
     ) {
         parent::__construct(
             $fileResolver,
@@ -38,7 +38,7 @@ class Reader extends \Magento\Framework\Config\Reader\Filesystem
             $fileName,
             $idAttributes,
             $domDocumentClass,
-            $defaultScope
+            $defaultScope,
         );
     }
 
@@ -52,7 +52,7 @@ class Reader extends \Magento\Framework\Config\Reader\Filesystem
             $this->_fileName,
             $this->_defaultScope,
             $theme->getArea(),
-            $theme
+            $theme,
         );
 
         if (!count($fileList)) {

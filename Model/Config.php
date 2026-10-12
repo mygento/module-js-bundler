@@ -38,7 +38,7 @@ class Config
         if ($this->enabled === null) {
             $this->enabled = $this->scopeConfig->getValue(
                 'mygento_js_bundler/general/enabled',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             );
         }
 

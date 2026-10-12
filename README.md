@@ -9,7 +9,9 @@
 
 ## Usage
 
-Place a file js_bundler.xml in theme's etc folder
+Place a file js_bundler.xml in theme's etc folder.
+
+Every `item` is a RequireJS module id; for a `paths` alias, set the file in `path`, without `.js`.
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
@@ -19,14 +21,24 @@ Place a file js_bundler.xml in theme's etc folder
       <item>Magento_Catalog/js/price-box</item>
       <item>Magento_Catalog/js/catalog-add-to-cart</item>
   </bundle>
-  ....
+  ...
   <bundle name="checkout">
-      <item>....</item>
-      <item>....</item>
-      <item>....</item>
+      <item path="requirejs/domReady">domReady</item>
+      <item>text!Magento_Checkout/template/minicart/content.html</item>
+      <item path="Magento_Ui/templates/modal/modal-popup.html">text!ui/template/modal/modal-popup.html</item>
+      <item>...</item>
   </bundle>
 </bundles>
 ```
 
+`setup:static-content:deploy` writes:
+
+* `js/bundle/<name>-bundle.js` for every bundle of two or more items, modules and text resources together;
+* `js/bundle/requirejs-bundles.js` with `require.config({bundles: ...})` listing exactly the bundled modules and text resources: RequireJS takes a listed text resource from its bundle instead of requesting the file.
+
+With `mygento_js_bundler/general/enabled` set, `requirejs-bundles.js` is added to `<head>` before `mage/requirejs/mixins.js`, so that mixins of bundled modules apply.
+
+Do not bundle `shim` modules or non-AMD files.
+
 ## Compability
-The module is tested on magento version 2.3.x
+The module is tested on magento version 2.4.7
