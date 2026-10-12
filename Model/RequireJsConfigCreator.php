@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019-2022 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 
@@ -39,7 +39,7 @@ class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
     public function __construct(
         Filesystem $filesystem,
         Repository $assetRepository,
-        Minification $minification
+        Minification $minification,
     ) {
         $this->filesystem = $filesystem;
         $this->assetRepository = $assetRepository;
@@ -57,7 +57,7 @@ class RequireJsConfigCreator implements RequireJsConfigCreatorInterface
     {
         $staticContext = $this->assetRepository->getStaticViewFileContext();
         $configFileRelativePath = $this->minification->addMinifiedSign(
-            $staticContext->getConfigPath() . '/' . $configFileName
+            $staticContext->getConfigPath() . '/' . $configFileName,
         );
 
         $dir = $this->filesystem->getDirectoryWrite(DirectoryList::STATIC_VIEW);

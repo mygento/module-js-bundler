@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019-2022 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 
@@ -38,7 +38,7 @@ class Config
     public function __construct(
         \Mygento\JsBundler\Model\Config\Schema $config,
         RequireJsConfigCreatorInterface $requireJsConfigCreator,
-        \Magento\Framework\View\DesignInterface $design
+        \Magento\Framework\View\DesignInterface $design,
     ) {
         $this->requireJsConfigCreator = $requireJsConfigCreator;
         $this->config = $config;

@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019-2022 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 
@@ -65,7 +65,7 @@ class Builder
         \Magento\Framework\App\Utility\Files $files,
         \Magento\Framework\View\Asset\Minification $minification,
         \Mygento\JsBundler\Model\Config\Schema $config,
-        \Magento\Framework\View\Design\Theme\ThemeProvider $design
+        \Magento\Framework\View\Design\Theme\ThemeProvider $design,
     ) {
         $this->helper = $helper;
         $this->utilityFiles = $files;
@@ -114,15 +114,15 @@ class Builder
                 $bundle = $files[$this->minification->removeMinifiedSign($filePath)];
                 $this->content[$bundle][] = $this->updateFile(
                     $this->minification->removeMinifiedSign($filePath),
-                    $this->minification->addMinifiedSign($relativePath)
+                    $this->minification->addMinifiedSign($relativePath),
                 );
             }
         }
         foreach ($this->content as $bundleName => $content) {
             $bundleFile = $this->pubStaticDir->openFile(
                 $this->minification->addMinifiedSign(
-                    $pathToBundleDir . DIRECTORY_SEPARATOR . $bundleName . '-bundle.js'
-                )
+                    $pathToBundleDir . DIRECTORY_SEPARATOR . $bundleName . '-bundle.js',
+                ),
             );
             $bundleFile->write(implode(PHP_EOL, $content));
         }

@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019-2022 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 
@@ -54,7 +54,7 @@ class Config extends AbstractBlock
         RequireJsConfigAssetReceiverInterface $requireJsConfigAssetReceiver,
         DirectoryList $directoryList,
         RequireJsConfig $requireJsConfig,
-        array $data = []
+        array $data = [],
     ) {
         parent::__construct($context, $data);
 
@@ -72,7 +72,7 @@ class Config extends AbstractBlock
     {
         $assetCollection = $this->pageConfig->getAssetCollection();
         $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(
-            self::REQUIREJS_CONFIG_BUNDLER_FILE
+            self::REQUIREJS_CONFIG_BUNDLER_FILE,
         );
         $requireJsConfigBundlerFullPath = $this->directoryList->getPath(DirectoryList::STATIC_VIEW)
          . '/' . $requireJsConfigBundler->getPath();
@@ -81,12 +81,12 @@ class Config extends AbstractBlock
             $assetCollection->insert(
                 $requireJsConfigBundler->getPath(),
                 $requireJsConfigBundler,
-                $this->requireJsConfig->getMixinsFileRelativePath()
+                $this->requireJsConfig->getMixinsFileRelativePath(),
             );
 
             //remove original requirejs-config from asset collection
             $requireJsConfigOriginal = $this->requireJsConfigAssetReceiver->receive(
-                self::REQUIREJS_CONFIG_ORIGINAL_FILE
+                self::REQUIREJS_CONFIG_ORIGINAL_FILE,
             );
             $assetCollection->remove($requireJsConfigOriginal->getPath());
         }

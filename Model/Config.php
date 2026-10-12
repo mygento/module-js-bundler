@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019-2022 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 
@@ -38,7 +38,7 @@ class Config
         if ($this->enabled === null) {
             $this->enabled = $this->scopeConfig->getValue(
                 'mygento_js_bundler/general/enabled',
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             );
         }
 

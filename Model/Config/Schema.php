@@ -2,7 +2,7 @@
 
 /**
  * @author Mygento Team
- * @copyright 2019-2022 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 
@@ -30,7 +30,7 @@ class Schema extends \Magento\Framework\Config\Data
         Reader $reader,
         \Magento\Framework\Config\CacheInterface $cache,
         $cacheId = 'js_bundler_schema_config',
-        \Magento\Framework\Serialize\SerializerInterface $serializer = null
+        ?\Magento\Framework\Serialize\SerializerInterface $serializer = null,
     ) {
         parent::__construct($reader, $cache, $cacheId, $serializer);
         $this->reader = $reader;
