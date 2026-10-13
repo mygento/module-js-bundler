@@ -9,163 +9,129 @@
 namespace Mygento\JsBundler\Plugin;
 
 use Magento\Deploy\Package\BundleInterface;
+use Magento\Deploy\Service\Bundle;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\WriteInterface;
+use Magento\Framework\View\Asset\Minification;
+use Magento\Framework\View\Design\Theme\ThemeProvider;
+use Mygento\JsBundler\Model\BundleWrapper;
+use Mygento\JsBundler\Model\Config\Bundles;
+use Mygento\JsBundler\Model\PackageFiles;
+use Psr\Log\LoggerInterface;
 
 class Builder
 {
     public const JSEXT = '.js';
+    public const BUNDLES_CONFIG_FILE = BundleInterface::BUNDLE_JS_DIR . '/requirejs-bundles.js';
+    private const TEMPLATE_EXT = '.html';
+    private const TEXT_RESOURCE_PREFIX = 'text!';
+    private const BUNDLE_SUFFIX = '-bundle';
 
-    /**
-     * @var \Magento\Framework\View\Design\Theme\ThemeProvider
-     */
-    private $design;
+    private WriteInterface $pubStaticDir;
 
-    /**
-     * @var \Mygento\JsBundler\Helper\Data
-     */
-    private $helper;
-
-    /**
-     * @var \Magento\Framework\View\Asset\Minification
-     */
-    private $minification;
-
-    /**
-     * @var \Magento\Framework\App\Utility\Files
-     */
-    private $utilityFiles;
-
-    /**
-     * @var string
-     */
-    private $pubStaticDir;
-
-    /**
-     * @var array
-     */
-    private $content;
-
-    /**
-     * @var \Mygento\JsBundler\Model\Config\Schema
-     */
-    private $config;
-
-    /**
-     * @param \Mygento\JsBundler\Helper\Data $helper
-     * @param \Magento\Framework\Filesystem $fs
-     * @param \Magento\Framework\App\Utility\Files $files
-     * @param \Magento\Framework\View\Asset\Minification $minification
-     * @param \Mygento\JsBundler\Model\Config\Schema $config
-     * @param \Magento\Framework\View\DesignInterface $design
-     * @throws \Magento\Framework\Exception\FileSystemException
-     */
     public function __construct(
-        \Mygento\JsBundler\Helper\Data $helper,
-        \Magento\Framework\Filesystem $fs,
-        \Magento\Framework\App\Utility\Files $files,
-        \Magento\Framework\View\Asset\Minification $minification,
-        \Mygento\JsBundler\Model\Config\Schema $config,
-        \Magento\Framework\View\Design\Theme\ThemeProvider $design,
+        Filesystem $filesystem,
+        private Minification $minification,
+        private Bundles $bundles,
+        private ThemeProvider $themeProvider,
+        private LoggerInterface $logger,
+        private BundleWrapper $bundleWrapper,
+        private PackageFiles $packageFiles,
     ) {
-        $this->helper = $helper;
-        $this->utilityFiles = $files;
-        $this->minification = $minification;
-        $this->pubStaticDir = $fs->getDirectoryWrite(DirectoryList::STATIC_VIEW);
-        $this->content = [];
-        $this->config = $config;
-
-        $this->design = $design;
+        $this->pubStaticDir = $filesystem->getDirectoryWrite(DirectoryList::STATIC_VIEW);
     }
 
     /**
-     * @param \Magento\Deploy\Service\Bundle $subject
-     * @param mixed $result
-     * @param string $area
-     * @param string $theme
-     * @param string $locale
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+     * @param mixed $result
      */
-    public function afterDeploy($subject, $result, $area, $theme, $locale)
+    public function afterDeploy(Bundle $subject, $result, string $area, string $theme, string $locale)
     {
-        $themeClass = $this->design->getThemeByFullPath($area . '/' . $theme);
-        $config = $this->config->getConfig($themeClass);
-        if (!($config)) {
-            return $result;
-        }
+        $packageDir = $area . '/' . $theme . '/' . $locale;
+        $themeBundles = $this->bundles->getByTheme($this->themeProvider->getThemeByFullPath($area . '/' . $theme));
 
-        $this->content = [];
-
-        $folder = implode(DIRECTORY_SEPARATOR, [$area, $theme, $locale]);
-        $pathToBundleDir = implode(DIRECTORY_SEPARATOR, [$folder, BundleInterface::BUNDLE_JS_DIR]);
-        $packageDir = $this->pubStaticDir->getAbsolutePath($folder);
-        $filesList = $this->utilityFiles->getFiles([$packageDir], '*.*');
-
-        $files = $this->helper->transformConfig($config);
-        $bundleFiles = array_keys($files);
-        if (count($bundleFiles) < 2) {
-            return $result;
-        }
-
-        foreach ($bundleFiles as $filePath) {
-            $relativePath = $packageDir . '/' . $this->pubStaticDir->getRelativePath($filePath . self::JSEXT);
-            $relativePath = $this->minification->addMinifiedSign($relativePath);
-
-            if (in_array($relativePath, $filesList)) {
-                $bundle = $files[$this->minification->removeMinifiedSign($filePath)];
-                $this->content[$bundle][] = $this->updateFile(
-                    $this->minification->removeMinifiedSign($filePath),
-                    $this->minification->addMinifiedSign($relativePath),
-                );
+        $bundledModules = [];
+        foreach ($themeBundles as $bundleName => $modules) {
+            $wrappedModules = $this->wrapModules($packageDir, $bundleName, $modules);
+            if (count($wrappedModules) < 2) {
+                continue;
             }
-        }
-        foreach ($this->content as $bundleName => $content) {
-            $bundleFile = $this->pubStaticDir->openFile(
-                $this->minification->addMinifiedSign(
-                    $pathToBundleDir . DIRECTORY_SEPARATOR . $bundleName . '-bundle.js',
-                ),
+
+            $bundleId = BundleInterface::BUNDLE_JS_DIR . '/' . $bundleName . self::BUNDLE_SUFFIX;
+            $this->pubStaticDir->writeFile(
+                $this->minification->addMinifiedSign($packageDir . '/' . $bundleId . self::JSEXT),
+                $this->bundleWrapper->wrapBundle($wrappedModules),
             );
-            $bundleFile->write(implode(PHP_EOL, $content));
+            $bundledModules[$bundleId] = array_keys($wrappedModules);
+        }
+
+        if ($bundledModules !== []) {
+            $this->pubStaticDir->writeFile(
+                $this->minification->addMinifiedSign($packageDir . '/' . self::BUNDLES_CONFIG_FILE),
+                $this->bundleWrapper->wrapBundlesConfig($bundledModules),
+            );
         }
 
         return $result;
     }
 
-    /**
-     * @param string $filename
-     * @param string $source
-     * @return string
-     */
-    private function updateFile($filename, $source): string
+    private function wrapModules(string $packageDir, string $bundleName, array $modules): array
     {
-        $content = $this->getFileContent($source);
-        $file = pathinfo($filename);
-
-        if ($file['dirname'] == 'jquery/ui-modules') {
-            $file['dirname'] = 'jquery-ui-modules';
+        $wrappedModules = [];
+        foreach ($modules as $id => $path) {
+            if (strpos($id, self::TEXT_RESOURCE_PREFIX) === 0) {
+                $wrappedModules[$id] = $this->wrapTextResource($packageDir, $bundleName, $id, $path);
+            } else {
+                $wrappedModules[$id] = $this->wrapModule($packageDir, $bundleName, $id, $path);
+            }
         }
 
-        $fileId = $file['dirname'] . '/' . $file['filename'];
-
-        $content = str_replace("define(\n ", "define('{$fileId}',", $content);
-        $content = str_replace('define([', "define('{$fileId}',[", $content);
-        $content = str_replace('define(function ()', "define('{$fileId}', [], function()", $content);
-
-        return str_replace('define(function()', "define('{$fileId}', [], function()", $content);
+        return array_filter($wrappedModules);
     }
 
-    /**
-     * Get content of static file
-     *
-     * @param string $sourcePath
-     * @return string
-     */
-    private function getFileContent($sourcePath)
+    private function wrapModule(string $packageDir, string $bundleName, string $id, string $path): ?string
     {
-        $content = $this->pubStaticDir->readFile($this->minification->addMinifiedSign($sourcePath));
-        if (mb_detect_encoding($content) !== 'UTF-8') {
-            $content = mb_convert_encoding($content, 'UTF-8');
+        $file = $this->minification->addMinifiedSign(
+            $this->packageFiles->getDeployedFilePath($packageDir, $path . self::JSEXT),
+        );
+        if (!$this->pubStaticDir->isFile($file)) {
+            $this->logger->warning(
+                'JS bundle module skipped: file not found',
+                ['bundle' => $bundleName, 'module' => $id, 'file' => $file],
+            );
+
+            return null;
         }
 
-        return $content;
+        $template = $this->packageFiles->getDeployedFilePath($packageDir, $path . self::TEMPLATE_EXT);
+        if ($this->pubStaticDir->isFile($template)) {
+            $this->logger->warning(
+                'JS bundle module skipped: its template URL would resolve to the bundle',
+                ['bundle' => $bundleName, 'module' => $id, 'template' => $template],
+            );
+
+            return null;
+        }
+
+        return $this->bundleWrapper->wrapModule($id, $this->pubStaticDir->readFile($file));
+    }
+
+    private function wrapTextResource(string $packageDir, string $bundleName, string $id, string $path): ?string
+    {
+        $file = $this->packageFiles->getDeployedFilePath(
+            $packageDir,
+            $path === $id ? substr($id, strlen(self::TEXT_RESOURCE_PREFIX)) : $path,
+        );
+        if (!$this->pubStaticDir->isFile($file)) {
+            $this->logger->warning(
+                'JS bundle text resource skipped: file not found',
+                ['bundle' => $bundleName, 'module' => $id, 'file' => $file],
+            );
+
+            return null;
+        }
+
+        return $this->bundleWrapper->wrapTextResource($id, $this->pubStaticDir->readFile($file));
     }
 }

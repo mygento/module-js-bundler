@@ -26,7 +26,7 @@ class Converter implements \Magento\Framework\Config\ConverterInterface
                 $result[$name] = [];
             }
             foreach ($bundle->getElementsByTagName('item') as $item) {
-                $result[$name][] = $item->nodeValue;
+                $result[$name][$item->nodeValue] = $item->getAttribute('path') ?: $item->nodeValue;
             }
         }
 

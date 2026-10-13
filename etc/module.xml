@@ -2,10 +2,14 @@
 <!--
 /**
  * @author Mygento
- * @copyright 2019 Mygento (https://www.mygento.ru)
+ * @copyright 2019-2026 Mygento (https://www.mygento.com)
  * @package Mygento_JsBundler
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-    <module name="Mygento_JsBundler" setup_version="2.3.0"></module>
+    <module name="Mygento_JsBundler">
+        <sequence>
+            <module name="Magento_Theme"/>
+        </sequence>
+    </module>
 </config>

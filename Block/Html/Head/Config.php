@@ -9,86 +9,40 @@
 namespace Mygento\JsBundler\Block\Html\Head;
 
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Filesystem;
+use Magento\Framework\Filesystem\Directory\ReadInterface;
 use Magento\Framework\RequireJs\Config as RequireJsConfig;
 use Magento\Framework\View\Element\AbstractBlock;
 use Magento\Framework\View\Element\Context;
 use Magento\Framework\View\Page\Config as PageConfig;
 use Mygento\JsBundler\Api\RequireJsConfigAssetReceiverInterface;
+use Mygento\JsBundler\Plugin\Builder;
 
 class Config extends AbstractBlock
 {
-    public const REQUIREJS_CONFIG_BUNDLER_FILE = 'requirejs-config-bundler.js';
-    public const REQUIREJS_CONFIG_ORIGINAL_FILE = 'requirejs-config.js';
+    private ReadInterface $pubStaticDir;
 
-    /**
-     * @var PageConfig
-     */
-    private $pageConfig;
-
-    /**
-     * @var RequireJsConfigAssetReceiverInterface
-     */
-    private $requireJsConfigAssetReceiver;
-
-    /**
-     * @var DirectoryList
-     */
-    private $directoryList;
-
-    /**
-     * @var RequireJsConfig
-     */
-    private $requireJsConfig;
-
-    /**
-     * @param Context $context
-     * @param PageConfig $pageConfig
-     * @param RequireJsConfigAssetReceiverInterface $requireJsConfigAssetReceiver
-     * @param DirectoryList $directoryList
-     * @param RequireJsConfig $requireJsConfig
-     * @param array $data
-     */
     public function __construct(
         Context $context,
-        PageConfig $pageConfig,
-        RequireJsConfigAssetReceiverInterface $requireJsConfigAssetReceiver,
-        DirectoryList $directoryList,
-        RequireJsConfig $requireJsConfig,
+        private PageConfig $pageConfig,
+        private RequireJsConfigAssetReceiverInterface $requireJsConfigAssetReceiver,
+        Filesystem $filesystem,
         array $data = [],
     ) {
         parent::__construct($context, $data);
 
-        $this->pageConfig = $pageConfig;
-        $this->requireJsConfigAssetReceiver = $requireJsConfigAssetReceiver;
-        $this->directoryList = $directoryList;
-        $this->requireJsConfig = $requireJsConfig;
+        $this->pubStaticDir = $filesystem->getDirectoryRead(DirectoryList::STATIC_VIEW);
     }
 
-    /**
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @return AbstractBlock
-     */
     protected function _prepareLayout()
     {
-        $assetCollection = $this->pageConfig->getAssetCollection();
-        $requireJsConfigBundler = $this->requireJsConfigAssetReceiver->receive(
-            self::REQUIREJS_CONFIG_BUNDLER_FILE,
-        );
-        $requireJsConfigBundlerFullPath = $this->directoryList->getPath(DirectoryList::STATIC_VIEW)
-         . '/' . $requireJsConfigBundler->getPath();
-
-        if (file_exists($requireJsConfigBundlerFullPath)) { //phpcs:ignore
-            $assetCollection->insert(
-                $requireJsConfigBundler->getPath(),
-                $requireJsConfigBundler,
-                $this->requireJsConfig->getMixinsFileRelativePath(),
+        $bundlesConfig = $this->requireJsConfigAssetReceiver->receive(Builder::BUNDLES_CONFIG_FILE);
+        if ($this->pubStaticDir->isFile($bundlesConfig->getPath())) {
+            $this->pageConfig->getAssetCollection()->insert(
+                $bundlesConfig->getFilePath(),
+                $bundlesConfig,
+                RequireJsConfig::REQUIRE_JS_FILE_NAME,
             );
-
-            //remove original requirejs-config from asset collection
-            $requireJsConfigOriginal = $this->requireJsConfigAssetReceiver->receive(
-                self::REQUIREJS_CONFIG_ORIGINAL_FILE,
-            );
-            $assetCollection->remove($requireJsConfigOriginal->getPath());
         }
 
         return parent::_prepareLayout();
