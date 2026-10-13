@@ -36,6 +36,8 @@ Every `item` is a RequireJS module id; for a `paths` alias, set the file in `pat
 * `js/bundle/<name>-bundle.js` for every bundle of two or more items, modules and text resources together;
 * `js/bundle/requirejs-bundles.js` with `require.config({bundles: ...})` listing exactly the bundled modules and text resources: RequireJS takes a listed text resource from its bundle instead of requesting the file.
 
+All deploy strategies are supported.
+
 With `mygento_js_bundler/general/enabled` set, `requirejs-bundles.js` is added to `<head>` before `mage/requirejs/mixins.js`, so that mixins of bundled modules apply.
 
 Do not bundle `shim` modules or non-AMD files.

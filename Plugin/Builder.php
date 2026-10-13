@@ -17,6 +17,7 @@ use Magento\Framework\View\Asset\Minification;
 use Magento\Framework\View\Design\Theme\ThemeProvider;
 use Mygento\JsBundler\Model\BundleWrapper;
 use Mygento\JsBundler\Model\Config\Bundles;
+use Mygento\JsBundler\Model\PackageFiles;
 use Psr\Log\LoggerInterface;
 
 class Builder
@@ -36,6 +37,7 @@ class Builder
         private ThemeProvider $themeProvider,
         private LoggerInterface $logger,
         private BundleWrapper $bundleWrapper,
+        private PackageFiles $packageFiles,
     ) {
         $this->pubStaticDir = $filesystem->getDirectoryWrite(DirectoryList::STATIC_VIEW);
     }
@@ -90,7 +92,9 @@ class Builder
 
     private function wrapModule(string $packageDir, string $bundleName, string $id, string $path): ?string
     {
-        $file = $this->minification->addMinifiedSign($packageDir . '/' . $path . self::JSEXT);
+        $file = $this->minification->addMinifiedSign(
+            $this->packageFiles->getDeployedFilePath($packageDir, $path . self::JSEXT),
+        );
         if (!$this->pubStaticDir->isFile($file)) {
             $this->logger->warning(
                 'JS bundle module skipped: file not found',
@@ -100,7 +104,7 @@ class Builder
             return null;
         }
 
-        $template = $packageDir . '/' . $path . self::TEMPLATE_EXT;
+        $template = $this->packageFiles->getDeployedFilePath($packageDir, $path . self::TEMPLATE_EXT);
         if ($this->pubStaticDir->isFile($template)) {
             $this->logger->warning(
                 'JS bundle module skipped: its template URL would resolve to the bundle',
@@ -115,7 +119,10 @@ class Builder
 
     private function wrapTextResource(string $packageDir, string $bundleName, string $id, string $path): ?string
     {
-        $file = $packageDir . '/' . ($path === $id ? substr($id, strlen(self::TEXT_RESOURCE_PREFIX)) : $path);
+        $file = $this->packageFiles->getDeployedFilePath(
+            $packageDir,
+            $path === $id ? substr($id, strlen(self::TEXT_RESOURCE_PREFIX)) : $path,
+        );
         if (!$this->pubStaticDir->isFile($file)) {
             $this->logger->warning(
                 'JS bundle text resource skipped: file not found',
