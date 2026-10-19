@@ -15,22 +15,52 @@ class BundleWrapper
     private const BUNDLES_CONFIG_WRAPPER = "require.config(%s);\n";
     private const BUNDLE_WRAPPER = <<<'JS'
 (function (define) {
-    var defineAs = function (id) {
-        var namedDefine = function () {
-            var args = Array.prototype.slice.call(arguments);
+    var defineAs = (function (shimConfig) {
+        var pendingModule = null;
+        var defineScript = function () {
+            var shim;
 
-            if (typeof args[0] !== 'string') {
-                args.unshift(id);
+            if (pendingModule === null || pendingModule.defined) {
+                return;
             }
 
-            return define.apply(this, args);
+            shim = shimConfig[pendingModule.id] || {};
+            define(pendingModule.id, shim.deps || [], shim.exportsFn);
+        };
+        var defineAs = function (id) {
+            var shimDeps = (shimConfig[id] || {}).deps || [];
+            var wrapped = {id: id, defined: false};
+            var namedDefine = function () {
+                var args = Array.prototype.slice.call(arguments);
+
+                if (typeof args[0] !== 'string') {
+                    args.unshift(id);
+                }
+
+                if (args[0] === id) {
+                    wrapped.defined = true;
+                }
+
+                if (args[0] === id && Array.isArray(args[1])) {
+                    args[1] = args[1].concat(shimDeps);
+                }
+
+                return define.apply(this, args);
+            };
+
+            namedDefine.amd = define.amd;
+            defineScript();
+            pendingModule = wrapped;
+
+            return namedDefine;
         };
 
-        namedDefine.amd = define.amd;
+        defineAs.end = defineScript;
 
-        return namedDefine;
-    };
+        return defineAs;
+    }(require.s.contexts._.config.shim));
 %s
+    defineAs.end();
 }).call(this, define);
 
 JS;

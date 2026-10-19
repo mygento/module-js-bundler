@@ -40,7 +40,7 @@ All deploy strategies are supported.
 
 With `mygento_js_bundler/general/enabled` set, `requirejs-bundles.js` is added to `<head>` before `mage/requirejs/mixins.js`, so that mixins of bundled modules apply.
 
-Do not bundle `shim` modules or non-AMD files.
+A `shim` module can be bundled. An AMD module gets its `shim` deps appended to the deps array of its own `define`.
 
 ## Compability
 The module is tested on magento version 2.4.7

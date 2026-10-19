@@ -83,15 +83,20 @@ class Builder
             if (strpos($id, self::TEXT_RESOURCE_PREFIX) === 0) {
                 $wrappedModules[$id] = $this->wrapTextResource($packageDir, $bundleName, $id, $path);
             } else {
-                $wrappedModules[$id] = $this->wrapModule($packageDir, $bundleName, $id, $path);
+                $wrappedModules[$id] = $this->wrapModule($packageDir, $bundleName, $id, $path, $modules);
             }
         }
 
         return array_filter($wrappedModules);
     }
 
-    private function wrapModule(string $packageDir, string $bundleName, string $id, string $path): ?string
-    {
+    private function wrapModule(
+        string $packageDir,
+        string $bundleName,
+        string $id,
+        string $path,
+        array $bundleModules,
+    ): ?string {
         $file = $this->minification->addMinifiedSign(
             $this->packageFiles->getDeployedFilePath($packageDir, $path . self::JSEXT),
         );
@@ -105,7 +110,10 @@ class Builder
         }
 
         $template = $this->packageFiles->getDeployedFilePath($packageDir, $path . self::TEMPLATE_EXT);
-        if ($this->pubStaticDir->isFile($template)) {
+        if (
+            $this->pubStaticDir->isFile($template)
+            && !isset($bundleModules[self::TEXT_RESOURCE_PREFIX . $id . self::TEMPLATE_EXT])
+        ) {
             $this->logger->warning(
                 'JS bundle module skipped: its template URL would resolve to the bundle',
                 ['bundle' => $bundleName, 'module' => $id, 'template' => $template],
